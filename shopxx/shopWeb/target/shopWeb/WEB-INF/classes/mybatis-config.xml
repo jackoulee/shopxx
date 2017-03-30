@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" ?>  
+<!DOCTYPE configuration  
+  PUBLIC "-//mybatis.org//DTD Config 3.0//EN"  
+  "http://mybatis.org/dtd/mybatis-3-config.dtd">
+<configuration>
+<settings>  
+        <!-- 使用log4j来输出记录日志 
+             logImpl固定配置日志的属性
+             name 是固定的属性名 value是属性值
+        -->
+        <setting name="logImpl" value="LOG4J"/>  
+</settings>  
+</configuration>

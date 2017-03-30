@@ -1,0 +1,87 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--namespace 配置对应接口的类路径 -->
+
+<mapper namespace="com.shop.mapper.good.GoodMapper">
+	<!-- 商品分页 -->
+	<select id="queryAllGoods" parameterType="java.util.Map" resultType="java.util.Map">
+	SELECT * FROM
+	(SELECT T.*,ROWNUM RN FROM
+		(select G.PRO_ID AS GOODID, G.PRO_NO AS goodNo ,G.PRO_NAME as goodName, G.PRO_TOTALNO AS totalNo, 
+			G.PRO_DIS AS goodInfo, G.PRO_TIME AS alterDate,G.GOOD_PRICE AS goodPrice, G.IS_SELLING AS ISSELLING, 
+			G.NOTE AS NOTE, G.TYPE_ID AS TYPEID, GT.TYPE_NAME AS goodType, ST.SALE_NAME AS saleType, G.SALE_ID AS SALETYPEID, UT.USER_NAME AS USERNAME
+
+		FROM T_PROPERTIES G LEFT JOIN T_GOOD_TYPE GT 
+			ON G.TYPE_ID=GT.TYPE_ID 
+
+		LEFT JOIN T_SALE_TYPE ST 
+			ON ST.SALE_ID = G.SALE_ID
+			
+		LEFT JOIN T_USER UT
+			ON UT.USER_ID = G.USER_ID
+			
+		<include refid="conditionSql"></include>
+			
+			) T
+
+	WHERE ROWNUM &lt;= #{pageInfo.endRow}) 
+
+	WHERE RN &gt; #{pageInfo.startRow}
+	</select>
+	
+	<select id="queryGoodsCount" parameterType="java.util.Map" resultType="int">
+		SELECT count(*) 
+
+		FROM T_PROPERTIES G LEFT JOIN T_GOOD_TYPE GT 
+			ON G.TYPE_ID=GT.TYPE_ID 
+
+		LEFT JOIN T_SALE_TYPE ST 
+			ON ST.SALE_ID = G.SALE_ID
+			
+		<include refid="conditionSql"></include>
+	</select>
+	
+	<select id="querySaleType" resultType="java.util.Map">
+		SELECT SALE_ID AS SALEID, SALE_NAME AS SALENAME FROM T_SALE_TYPE 
+	</select>
+	
+	<sql id="conditionSql">
+		<where>
+			<if test="pageInfo.goodNo!=null and pageInfo.goodNo!=''">
+				G.PRO_NO  = #{pageInfo.goodNo}  
+			</if>
+			<if test="pageInfo.goodName!=null and pageInfo.goodName!=''">
+				G.PRO_NAME  like '%${pageInfo.goodName}%'  
+			</if>
+			<if test="pageInfo.goodSaleId!=null and pageInfo.goodSaleId!=''">
+				G.SALE_ID  = #{pageInfo.goodSaleId}  
+			</if>
+		</where>
+	</sql>
+	
+	<insert id="insertGood" parameterType="com.shop.entity.Good">
+	INSERT INTO T_PROPERTIES (
+			PRO_ID, PRO_NO, PRO_NAME, PRO_TOTALNO,
+			PRO_DIS, PRO_TIME, GOOD_PRICE, IS_SELLING,
+			NOTE, SALE_ID, TYPE_ID, USER_ID)
+	VALUES(
+			sys_guid(),#{goodNo}, #{goodName}, #{totalNumber}, 
+			#{goodInfo}, #{creatDate}, #{goodPrice}, #{isSelling}, 
+			#{note}, #{saleId}, #{typeId}, #{userId})
+	</insert>
+	
+	<update id="updateGood" parameterType="com.shop.entity.Good">
+	UPDATE T_PROPERTIES SET 
+			PRO_NO = #{goodNo}, PRO_NAME = #{goodName}, PRO_TOTALNO = #{totalNumber},
+			PRO_DIS = #{goodInfo}, PRO_TIME =  #{creatDate}, GOOD_PRICE = #{goodPrice}, IS_SELLING = #{isSelling},
+			NOTE = #{note}, SALE_ID = #{saleId}, TYPE_ID = #{typeId}, USER_ID = #{userId} 
+	WHERE PRO_ID = #{goodId}
+	</update>
+	
+	<delete id="deleteGoods" parameterType="java.util.List">
+	DELETE FROM T_PROPERTIES WHERE PRO_ID IN 
+		<foreach item="item" collection="list" open="(" separator="," close=")">
+            #{item}
+        </foreach>
+	</delete>
+</mapper>
