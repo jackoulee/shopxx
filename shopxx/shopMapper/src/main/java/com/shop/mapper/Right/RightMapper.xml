@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--namespace 配置对应接口的类路径  -->
+<mapper namespace="com.shop.mapper.Right.RightMapper" >
+    <!-- <resultMap type="com.jk.pojo.Role" id="role_map">
+        <id column="role_id" property="role_id"></id>
+        <result column="role_name" property="role_name"></result>
+    </resultMap> -->
+     
+     
+     
+     
+    <!--  <select id="addRight" parameterType="List">
+		INSERT ALL	
+        <foreach collection="list" item="roleRight" index="index" separator=",">  
+		 insert into t_right_role(role_id, right_id) values
+        (
+        	#{roleRight.role_id},#{roleRight.rightId}  	
+        ) 
+        </foreach>  		
+        SELECT * 
+        FROM dual
+	</select>	
+      -->
+     
+    <insert id="addRight" parameterType="java.util.List">
+        BEGIN
+        <foreach collection="list" item="roleRight" index="index" separator=";" >  
+        insert into t_right_role(role_id, right_id) values
+         
+          <!--  foreach 循环迭代标签
+           collection 对应要迭代的集合的类型  List(list) 数组(array)
+           item 循环遍历集合中的每一项元素
+           separator 字符串分割符 按照,分割 集合中的每一项元素以,分割 -->
+       
+             (#{roleRight.role_id},#{roleRight.rightId})  
+       </foreach>  
+       ;END;
+       
+    </insert>
+    
+    
+    
+   <!--  <insert id="updateRight" parameterType="java.util.List">
+        insert into t_right_role(role_id, right_id) values
+         
+           foreach 循环迭代标签
+           collection 对应要迭代的集合的类型  List(list) 数组(array)
+           item 循环遍历集合中的每一项元素
+           separator 字符串分割符 按照,分割 集合中的每一项元素以,分割
+       
+        <foreach collection="list" item="roleRight" index="index" separator="," >  
+             (#{roleRight.role_id},#{roleRight.rightId})  
+       </foreach>  
+       
+    </insert> -->
+    <insert id="updateRight" parameterType="java.util.List">
+          BEGIN
+        <foreach collection="list" item="roleRight" index="index" separator=";" >  
+        insert into t_right_role(role_id, right_id) values
+         
+          <!--  foreach 循环迭代标签
+           collection 对应要迭代的集合的类型  List(list) 数组(array)
+           item 循环遍历集合中的每一项元素
+           separator 字符串分割符 按照,分割 集合中的每一项元素以,分割 -->
+       
+             (#{roleRight.role_id},#{roleRight.rightId})  
+       </foreach>  
+       ;END;
+       
+    </insert>
+    
+</mapper>

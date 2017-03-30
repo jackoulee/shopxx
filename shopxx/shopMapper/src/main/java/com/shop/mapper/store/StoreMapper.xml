@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--namespace 配置对应接口的类路径  -->
+<mapper namespace="com.shop.mapper.store.StoreMapper" >
+    <select id="selectStore" parameterType="java.lang.String" resultType="java.util.Map">
+       select pro_id,pro_totalno from T_PROPERTIES pro where pro.pro_name=#{proName} and pro_dis=#{proDis} 
+    </select>
+ 	<insert id="insertAllStore" parameterType="java.util.List">
+            BEGIN
+            <foreach collection="list" item="item" index="index" separator=";" >
+               INSERT INTO T_STORELOG (pro_id,pro_no,pro_name,pro_dis,pro_totalno,pro_time) VALUES
+                (#{item.pro_id},#{item.pro_no},#{item.pro_name},#{item.pro_dis},#{item.pro_totalno},#{item.pro_time} )
+           </foreach>
+            ;END ;
+     </insert>
+     <insert id="insertStoreSame" parameterType="java.util.List">
+            BEGIN
+            <foreach collection="list" item="item" index="index" separator=";" >
+               INSERT INTO T_PROPERTIES (pro_id,pro_no,pro_name,pro_dis,pro_totalno,pro_time) VALUES
+                (#{item.pro_id},#{item.pro_no},#{item.pro_name},#{item.pro_dis},#{item.pro_totalno},#{item.pro_time} )
+           </foreach>
+            ;END ;
+     </insert>
+     <update id="updateStore" parameterType="java.util.List">
+           BEGIN
+            <foreach collection="list" item="item" index="index" separator=";" >
+               update T_PROPERTIES set pro_totalno = #{item.PRO_TOTALNO} where pro_id=#{item.PRO_ID}
+           </foreach>
+            ;END ;
+     </update>
+     <select id="queryAllPro" parameterType="java.lang.Integer" resultType="java.util.Map">
+      select t.* from 
+        (select pro.*,rownum ro from 
+          (select pro_id,pro_name,pro_no,pro_totalno,pro_dis,pro_time from T_PROPERTIES)pro)t
+      where ro between #{startRow} and #{endRow}  
+     </select>
+     <select id="queryCountPro" resultType="java.lang.Integer">
+        select count(*) from T_PROPERTIES
+     </select>
+       <select id="queryAllStore" parameterType="java.lang.Integer" resultType="java.util.Map">
+      select t.* from 
+        (select pro.*,rownum ro from 
+          (select count(*) pro_count,pro_order,pro_time from T_STORELOG group by PRO_ORDER,pro_time)pro)t
+      where ro between #{startRow} and #{endRow}  
+     </select>
+     <select id="queryCountStore" resultType="java.lang.Integer">
+         select count(*) from (select count(*) from T_STORELOG group by PRO_ORDER)
+     </select>
+     
+     <select id="queryStoreByNames" parameterType="java.util.Map" resultType="java.util.Map">
+      select t.* from 
+        (select pro.*,rownum ro from 
+          (select pro_id,pro_name,pro_no,pro_totalno,pro_dis from T_STORELOG where pro_order = #{proOrder})pro)t
+      where ro between #{startRow} and #{endRow}  
+     </select>
+     <select id="queryCountStoreByName" resultType="java.lang.Integer" parameterType="java.lang.String">
+        select count(*) from T_STORELOG where pro_order = #{proOrder}
+     </select>
+     
+</mapper>
+

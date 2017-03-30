@@ -1,0 +1,73 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<!--namespace 配置对应接口的类路径  -->
+<mapper namespace="com.shop.mapper.login.UserMapper" >
+  <!-- 定义结果集返回形式 
+                     配置数据库字段与实体类对应的映射关系
+  -->
+  <resultMap id="BaseResultMap" type="com.shop.entity.User" >
+    <!--id 主键字段使用id标签配置  
+        column 数据库中的字段
+        property 实体类中对应的属性
+    -->
+    <id column="USER_ID" property="userId"  />
+    <!-- 非主键字段使用 result-->
+    <result column="USER_NAME" property="userName" />
+    <result column="USER_PASSWORD" property="passWord" />
+  </resultMap>
+  
+  <resultMap id="ResultCount" type="com.shop.entity.Count" >
+    <!--id 主键字段使用id标签配置  
+        column 数据库中的字段
+        property 实体类中对应的属性
+    -->
+    <id column="COUNT_ID" property="countId"  />
+    <!-- 非主键字段使用 result-->
+    <result column="COUNT_NUMBER" property="countNumber" />
+    <result column="COUNT_DAY" property="countDay" />
+    <result column="COUNT_DAYTIME" property="countDaytime" />
+  </resultMap>
+  <!-- select标签 执行写查询sql语句 
+       resultMap 把查询的结果集转换成对应的对象
+       id 配置对应接口中的方法名
+  -->
+  <!-- 查询单个用户 用户登录和注册时候的判断 -->
+  <select id="queryUser" parameterType="java.lang.String" resultMap="BaseResultMap" >
+     select * from t_user where USER_NAME = #{userName}
+  </select>
+  
+  <!-- 注册一个新的用户 -->
+  <insert id="addUser" parameterType="com.shop.entity.User">
+  	 insert into t_user(USER_ID,USER_NAME,USER_PASSWORD) values(#{userId},#{userName},#{passWord})
+  </insert>
+  
+  <!-- 重置密码 -->
+  <update id="resetUser" parameterType="com.shop.entity.User">
+  	 update t_user set USER_PASSWORD = #{passWord} where USER_NAME = #{userName}
+  </update>
+  
+  <!-- 查询最近一周每一天的访问量 -->
+  <select id="queryCount" resultMap="ResultCount">
+  	 select t.* from (select * from t_count order by count_daytime desc) t 
+	 where rownum between 1 and 7 order by count_daytime
+  </select>
+  
+  <!-- 查询最近一天的访问量 -->
+  <select id="queryOneDay" resultMap="ResultCount">
+     select t.* from (select * from t_count order by count_daytime desc) t 
+	 where rownum = 1
+  </select>
+  
+  <!-- 重新统计时新增 -->
+  <insert id="addCount" parameterType="com.shop.entity.Count">
+  	insert into t_count(count_id,count_number,count_day,count_daytime) 
+  	values(#{countId},#{countNumber},#{countDay},#{countDaytime})
+  </insert>
+  
+  <!-- 统计访问人数及时刷新 -->
+  <update id="updateNumber" parameterType="map">
+  	update t_count set count_number = #{countNumber} where count_day = #{countDay}
+  </update>
+  
+</mapper>
+

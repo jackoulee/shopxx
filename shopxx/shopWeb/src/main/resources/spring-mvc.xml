@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xmlns:mvc="http://www.springframework.org/schema/mvc"
+    xmlns:context="http://www.springframework.org/schema/context"
+    xmlns:aop="http://www.springframework.org/schema/aop"
+    xmlns:tx="http://www.springframework.org/schema/tx"
+    xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+        http://www.springframework.org/schema/mvc
+        http://www.springframework.org/schema/mvc/spring-mvc-3.0.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-3.0.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+      http://www.springframework.org/schema/aop
+      http://www.springframework.org/schema/aop/spring-aop-3.0.xsd">
+ 
+     <!-- 注解扫描包 控制层 识别控制层的注解-->
+     <context:component-scan base-package="com.shop.controller" />
+     <!-- 开启注解 -->
+     <mvc:annotation-driven />
+ 
+
+ 
+     <!-- 定义跳转的文件的前后缀 ，视图模式配置-->
+     <!-- bean 的id 必须为 viewResolver 否则会报错 -->
+     <!-- 这里的配置我的理解是自动给后面action的方法return的字符串加上前缀和后缀，变成一个 可用的url地址 -->
+      <bean id="viewResolver"
+         class="org.springframework.web.servlet.view.InternalResourceViewResolver">
+         <!--prefix 前缀  -->
+         <property name="prefix" value="/WEB-INF/view/" />
+         <!-- action 方法return值为index  /WEB-INF/view/(前缀)index.jsp(后缀)-->
+         <!--suffix 后缀  -->
+         <property name="suffix" value=".jsp" />
+     </bean> 
+     
+     <!-- 在springMVC核心配置文件中配置上传文件需要相关内容
+          multipartResolver全局上传文件配置
+          maxUploadSize上传文件的大小  单位是kb 1m = 1024
+          resolveLazily 类似于hibernate中的懒加载  上传时如果出现异常不会立即报错 当使用到对应上传文件时会报错
+          maxInMemorySize (Memory内存) 上传时把文件内容加载到内存中的最大容量
+      -->
+   	 <bean id="multipartResolver"  class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="maxUploadSize" value="1048576000" />
+        <property name="resolveLazily" value="true"/>  
+        <property  name="maxInMemorySize" value="4096"/>  
+    </bean> 
+<!--    <mvc:interceptors>  
+    使用bean定义一个Interceptor，直接定义在mvc:interceptors根下面的Interceptor将拦截所有的请求  
+    <bean class="com.jk.Interceptor"/>  
+</mvc:interceptors> -->
+ </beans>

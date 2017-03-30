@@ -1,0 +1,59 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns:p="http://www.springframework.org/schema/p"
+	xmlns:aop="http://www.springframework.org/schema/aop" xmlns:tx="http://www.springframework.org/schema/tx"
+	xmlns:context="http://www.springframework.org/schema/context"
+	xsi:schemaLocation="
+ http://www.springframework.org/schema/beans
+ http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
+ http://www.springframework.org/schema/aop
+ http://www.springframework.org/schema/aop/spring-aop-3.0.xsd
+ http://www.springframework.org/schema/tx
+ http://www.springframework.org/schema/tx/spring-tx-3.0.xsd
+ http://www.springframework.org/schema/context
+ http://www.springframework.org/schema/context/spring-context-3.0.xsd">
+
+
+	<!-- 对指定的包进行组件扫描 base-package 主要扫描service 和 dao层的注解-->
+	<context:component-scan base-package="com.shop.service">
+	  	<context:include-filter type="regex" expression="service"/>
+	</context:component-scan>
+
+	<!-- 配置事务管理器  配置jdbc相关事务管理-->
+	<bean id="transactionManager"
+		class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+		<!-- 配置数据源 -->
+		<property name="dataSource" ref="dataSource"/>
+	</bean> 
+
+	<!--配置事务的传播特性 tx 事务的缩写 配置那些方法需要开启和提交事务，那些方法不许要开启和提交事务 -->
+	<tx:advice id="txAdvice" transaction-manager="transactionManager">
+		<tx:attributes>
+			<!--配置哪些方法需要开启事务 -->
+			<!--add* 只要方法名开头是add 就受此事务传播的控制 propagation 配置事务传播特性 REQUIRED 有事务支持当前事务，没有则开启一个新的事务,大部分情况下只要涉及到事务的方法都使用此配置 
+				rollback-for="java.lang.Exception" 当程序出现异常 回滚当前事务 -->
+			<tx:method name="add*" propagation="REQUIRED" rollback-for="java.lang.Exception" />
+			<tx:method name="save*" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="insert*" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="update*" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<tx:method name="delete*" propagation="REQUIRED"
+				rollback-for="java.lang.Exception" />
+			<!--把查询的事务配为只读事务 提高程序运行效率 -->
+			<tx:method name="find*" read-only="true" />
+			<tx:method name="query*" read-only="true" />
+			<tx:method name="get*" read-only="true" />
+		</tx:attributes>
+	</tx:advice>
+	<!--配置aop切面 -->
+	<aop:config>
+		<!--pointcut 切点 com.jk.service..*.* 找到com.jk.service下的所有类所有方法都受 事务的管理 Advice 
+			通知 告诉切点具体的切入位置 -->
+		<!-- 找到com.jk.service包 ..*找到service包下的所有类 .* 找到类中的所有的方法 -->
+		<aop:advisor advice-ref="txAdvice"
+			pointcut="execution(* com.shop.service.*..*.*(..))" />
+	</aop:config>
+</beans> 

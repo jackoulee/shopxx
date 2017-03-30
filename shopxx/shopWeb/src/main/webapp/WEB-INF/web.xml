@@ -1,0 +1,61 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<web-app version="3.0" 
+	xmlns="http://java.sun.com/xml/ns/javaee" 
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" 
+	xsi:schemaLocation="http://java.sun.com/xml/ns/javaee 
+	http://java.sun.com/xml/ns/javaee/web-app_3_0.xsd">
+
+  <display-name>ssm-web</display-name>
+  <!-- spring监听 方便spring根据spring配置文件创建对应的bean实例 -->
+       <!-- spring begin-->
+    <context-param><!-- 配置spring监听 -->
+    	<param-name>contextConfigLocation</param-name>
+    	<param-value>
+    	          classpath:spring-common.xml,classpath:spring-datasource.xml
+    	</param-value>  
+    </context-param>
+    <listener>
+    	<listener-class>org.springframework.web.context.ContextLoaderListener</listener-class>
+    </listener>
+    <!-- 配置springMVC核心servlet -->
+      <servlet>
+    <servlet-name>springMVC</servlet-name>
+    <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+    <!-- 初始化参数 -->
+    <init-param>
+       <!-- 配置文件路径 
+                                  参数名是固定不变的 contextConfigLocation
+       -->
+      <param-name>contextConfigLocation</param-name>
+      <!-- 初始化参数值 springMVC核心配置文件地址 -->
+      <param-value>classpath:spring-mvc.xml</param-value>
+    </init-param>
+    <!-- servlet自启动(在项目启动时实例化servlet) 参数是启动顺序(web.xml中配置多个servlet时标明启动顺序)  -->
+    <load-on-startup>1</load-on-startup>
+  </servlet>
+  <servlet-mapping>
+    <servlet-name>springMVC</servlet-name>
+    <!-- 配置访问后缀为.do 与struts2的.action类似 -->
+    <url-pattern>*.do</url-pattern>
+  </servlet-mapping>
+   <!-- 配置编码格式 
+        过滤springMVC请求中的内容(参数)把字符集转换为utf-8格式
+   --> 
+   <filter>
+    <filter-name>encodingFilter</filter-name>
+    <filter-class>org.springframework.web.filter.CharacterEncodingFilter</filter-class>
+    <init-param>
+      <param-name>encoding</param-name>
+      <param-value>UTF-8</param-value>
+    </init-param>
+    <init-param>
+      <param-name>forceEncoding</param-name>
+      <param-value>true</param-value>
+    </init-param>
+  </filter>
+  <filter-mapping>
+    <filter-name>encodingFilter</filter-name>
+    <!-- 只过滤*.do的请求 -->
+    <url-pattern>*.do</url-pattern>
+  </filter-mapping>
+</web-app>
